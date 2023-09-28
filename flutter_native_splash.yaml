@@ -1,0 +1,9 @@
+flutter_native_splash:
+  image: lib/assets/images/logo2.png
+  color: "#1b202e"
+  android_gravity: center
+  ios_content_mode: scaleToFill
+  ios_gravity: center
+  ios_status_bar: light_content
+  android: true
+  ios: true
