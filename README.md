@@ -1,4 +1,4 @@
-# Cosplay Marketplace
+# DressUpExchange - Mobile
 ![Flutter Badge](https://img.shields.io/badge/Flutter-v3.14.0-blue)
 ![Dart Badge](https://img.shields.io/badge/Dart-v3.2.0-blue)
 
