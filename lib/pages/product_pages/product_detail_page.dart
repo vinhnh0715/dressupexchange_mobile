@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:dressupexchange_mobile/models/product_model.dart';
 
 class ProductDetailPage extends StatelessWidget {
+  final Product product;
+  ProductDetailPage({required this.product});
   // final String itemId;
   // ProductDetailPage(this.itemId);
 
@@ -37,14 +40,17 @@ class ProductDetailPage extends StatelessWidget {
             ),
             // Title
             Text(
-              'Item Title',
-              style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
+              product.name,
+              style: TextStyle(
+                fontSize: 24.0,
+                fontWeight: FontWeight.bold,
+              ),
               textAlign: TextAlign.center,
             ),
 
             // Price
             Text(
-              'Price: \$100',
+              "Price: ${product.price} VND",
               style: TextStyle(fontSize: 18.0),
               textAlign: TextAlign.center,
             ),

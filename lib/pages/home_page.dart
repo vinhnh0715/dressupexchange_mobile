@@ -1,6 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:dressupexchange_mobile/services/api_service.dart';
+import 'package:dressupexchange_mobile/models/product_model.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  final ApiService _apiService = ApiService();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -9,33 +17,41 @@ class HomePage extends StatelessWidget {
           Container(
             padding: EdgeInsets.all(8.0),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  children: [
-                    IconButton(
-                      icon: Icon(Icons.search),
-                      onPressed: () {
-                        // Handle search button click
-                      },
+                Expanded(
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 8.0),
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: Colors.grey,
+                        width: 1.0,
+                      ),
+                      borderRadius: BorderRadius.circular(25.0),
                     ),
-                    SizedBox(width: 8.0),
-                    Container(
-                      width: 200.0,
-                      child: TextField(
-                        decoration: InputDecoration(
-                          hintText: "Search",
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(25.0),
-                          ),
-                          contentPadding: EdgeInsets.symmetric(
-                            vertical: 10.0,
-                            horizontal: 15.0,
+                    child: Row(
+                      children: [
+                        IconButton(
+                          icon: Icon(Icons.search),
+                          onPressed: () {
+                            // Handle search button click
+                          },
+                        ),
+                        SizedBox(width: 8.0),
+                        Expanded(
+                          child: TextField(
+                            decoration: InputDecoration(
+                              hintText: "Search",
+                              border: InputBorder.none,
+                              contentPadding: EdgeInsets.symmetric(
+                                vertical: 10.0,
+                                horizontal: 15.0,
+                              ),
+                            ),
                           ),
                         ),
-                      ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
                 IconButton(
                   icon: Icon(Icons.menu),
@@ -47,59 +63,77 @@ class HomePage extends StatelessWidget {
             ),
           ),
           Expanded(
-            child: GridView.builder(
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                childAspectRatio: 0.7,
-              ),
-              itemCount: 10,
-              itemBuilder: (context, index) {
-                String title = "Item $index";
-                String price = "\$${(index + 1) * 10}";
-
-                return GestureDetector(
-                  onTap: () {
-                    // _navigateToProductDetail(context, title);
-                    Navigator.pushNamed(context, "/productDetail");
-                  },
-                  child: Card(
-                    margin: EdgeInsets.all(8.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Image.asset(
-                          "lib/assets/images/hatsune_miku.jpeg",
-                          width: 150.0,
-                          height: 150.0,
-                          fit: BoxFit.cover,
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            title,
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16.0,
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8.0,
-                            vertical: 4.0,
-                          ),
-                          child: Text(
-                            price,
-                            style: TextStyle(
-                              color: Colors.green,
-                              fontSize: 16.0,
-                            ),
-                          ),
-                        ),
-                      ],
+            child: FutureBuilder<List<Product>>(
+              future: _apiService.fetchProducts(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                } else if (snapshot.data == null || snapshot.data!.isEmpty) {
+                  return Center(child: Text('No products available.'));
+                } else {
+                  return GridView.builder(
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      childAspectRatio: 0.7,
                     ),
-                  ),
-                );
+                    itemCount: snapshot.data!.length,
+                    itemBuilder: (context, index) {
+                      final product = snapshot.data![index];
+                      String title = truncateTitle(product.name, 30);
+                      String price = "${product.price.toString()}VND";
+
+                      return GestureDetector(
+                        onTap: () {
+                          // Navigate to product detail page with product data
+                          _navigateToProductDetail(context, product);
+                        },
+                        child: Card(
+                          margin: EdgeInsets.all(8.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Center(
+                                child: Image.network(
+                                  product.images.isNotEmpty
+                                      ? product.images[0]
+                                      : "", // Use the first image URL if available
+                                  width: 150.0,
+                                  height: 150.0,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  title,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16.0,
+                                  ),
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8.0,
+                                  vertical: 4.0,
+                                ),
+                                child: Text(
+                                  price,
+                                  style: TextStyle(
+                                    color: Colors.green,
+                                    fontSize: 16.0,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                }
               },
             ),
           ),
@@ -108,12 +142,16 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  void _navigateToProductDetail(BuildContext context, String itemName) {
-    Navigator.pushNamed(context, "/productDetail");
-    // Navigator.of(context).push(
-    //   MaterialPageRoute(
-    //     builder: (context) => ProductDetailPage(itemName),
-    //   ),
-    // );
+  void _navigateToProductDetail(BuildContext context, Product product) {
+    Navigator.pushNamed(context, "/productDetail",
+        arguments: {'product': product});
+  }
+
+  String truncateTitle(String title, int maxLength) {
+    if (title.length <= maxLength) {
+      return title;
+    } else {
+      return title.substring(0, maxLength) + "...";
+    }
   }
 }

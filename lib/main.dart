@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:dressupexchange_mobile/routes/routes.dart';
 import 'package:dressupexchange_mobile/themes/theme.dart';
+import 'package:dressupexchange_mobile/pages/introduction_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -16,8 +17,8 @@ class MyApp extends StatelessWidget {
       themeMode: ThemeMode.system,
       theme: customLightTheme,
       //darkTheme: customDarkTheme,
-      initialRoute: "/",
-      routes: appRoutes,
+      initialRoute: "/introduction",
+      onGenerateRoute: generateRoute, // Use the custom route generator
       debugShowCheckedModeBanner: false,
     );
   }
