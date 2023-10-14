@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+//Pages
 import 'package:dressupexchange_mobile/pages/home_page.dart';
 import 'package:dressupexchange_mobile/pages/product_pages/product_detail_page.dart';
 import 'package:dressupexchange_mobile/pages/welcome_page.dart';
 import 'package:dressupexchange_mobile/pages/login_page.dart';
 import 'package:dressupexchange_mobile/pages/signup_page.dart';
 import 'package:dressupexchange_mobile/pages/introduction_screen.dart';
+import 'package:dressupexchange_mobile/pages/menu_page.dart';
+//Models
 import 'package:dressupexchange_mobile/models/product_model.dart';
 
 Route<dynamic> generateRoute(RouteSettings settings) {
@@ -17,6 +20,8 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       return MaterialPageRoute(builder: (context) => SignupPage());
     case "/home":
       return MaterialPageRoute(builder: (context) => HomePage());
+    case "/menu":
+      return MaterialPageRoute(builder: (context) => MenuPage());
     case "/productDetail":
       if (settings.arguments != null &&
           settings.arguments is Map<String, dynamic>) {

@@ -1,4 +1,4 @@
-package com.example.dressupexchange_mobile
+package com.theprotagonist.dressupexchange
 
 import io.flutter.embedding.android.FlutterActivity
 

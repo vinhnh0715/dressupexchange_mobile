@@ -56,7 +56,7 @@ class _HomePageState extends State<HomePage> {
                 IconButton(
                   icon: Icon(Icons.menu),
                   onPressed: () {
-                    // Handle menu button click
+                    Navigator.pushNamed(context, "/menu");
                   },
                 ),
               ],
