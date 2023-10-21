@@ -1,6 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:dressupexchange_mobile/services/api_service.dart';
 
 class SignupPage extends StatelessWidget {
+  final ApiService _apiService = ApiService();
+
+  // Define TextEditingController objects for the text fields
+  final TextEditingController phoneController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController fullnameController = TextEditingController();
+  final TextEditingController addressController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -11,8 +20,7 @@ class SignupPage extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Padding(
-                padding:
-                    EdgeInsets.only(right: 30.0), // Add margin to the right
+                padding: EdgeInsets.only(right: 30.0),
                 child: Align(
                   alignment: Alignment.centerRight,
                   child: Text(
@@ -26,32 +34,42 @@ class SignupPage extends StatelessWidget {
               ),
               SizedBox(height: 16.0),
               TextFormField(
-                decoration: InputDecoration(
-                  hintText: "Username",
-                  border: OutlineInputBorder(
-                    borderRadius:
-                        BorderRadius.circular(10.0), // Rounded corners
-                  ),
-                ),
-              ),
-              SizedBox(height: 16.0),
-              TextFormField(
+                controller: phoneController, // Use the phoneController
                 decoration: InputDecoration(
                   hintText: "Phone",
                   border: OutlineInputBorder(
-                    borderRadius:
-                        BorderRadius.circular(10.0), // Rounded corners
+                    borderRadius: BorderRadius.circular(10.0),
                   ),
                 ),
               ),
               SizedBox(height: 16.0),
               TextFormField(
+                controller: passwordController, // Use the passwordController
                 obscureText: true,
                 decoration: InputDecoration(
                   hintText: "Password",
                   border: OutlineInputBorder(
-                    borderRadius:
-                        BorderRadius.circular(10.0), // Rounded corners
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                ),
+              ),
+              SizedBox(height: 16.0),
+              TextFormField(
+                controller: fullnameController, // Use the fullnameController
+                decoration: InputDecoration(
+                  hintText: "Fullname",
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                ),
+              ),
+              SizedBox(height: 16.0),
+              TextFormField(
+                controller: addressController, // Use the addressController
+                decoration: InputDecoration(
+                  hintText: "Address",
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10.0),
                   ),
                 ),
               ),
@@ -59,7 +77,7 @@ class SignupPage extends StatelessWidget {
               Row(
                 children: [
                   Checkbox(
-                    value: false, // Add your logic here
+                    value: false,
                     onChanged: (bool? value) {
                       // Add your logic here
                     },
@@ -69,11 +87,38 @@ class SignupPage extends StatelessWidget {
               ),
               SizedBox(height: 16.0),
               ElevatedButton(
-                onPressed: () {
-                  // Add your signup logic here
+                onPressed: () async {
+                  try {
+                    await _apiService.registerUser(
+                      phoneController.text,
+                      passwordController.text,
+                      fullnameController.text,
+                      addressController.text,
+                    );
+                    Navigator.pushNamed(context, "/login");
+                  } catch (e) {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: Text("Registration Failed"),
+                          content: Text(
+                              "Failed to register. Please try again later."),
+                          actions: <Widget>[
+                            TextButton(
+                              child: Text("OK"),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  }
                 },
                 style: ElevatedButton.styleFrom(
-                  primary: Colors.orangeAccent, // Light brown-orange color
+                  primary: Colors.orangeAccent,
                 ),
                 child: Text("Sign Up"),
               ),

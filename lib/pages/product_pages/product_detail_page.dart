@@ -1,18 +1,45 @@
+import 'package:dressupexchange_mobile/utils/cart_database.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:dressupexchange_mobile/models/product_model.dart';
+import 'package:dressupexchange_mobile/models/cartItem_model.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class ProductDetailPage extends StatelessWidget {
   final Product product;
+  CartDatabaseHelper _cartDatabaseHelper = new CartDatabaseHelper();
   ProductDetailPage({required this.product});
   // final String itemId;
   // ProductDetailPage(this.itemId);
+
+  void showToast(BuildContext context, String message, bool isSuccess) {
+    Fluttertoast.showToast(
+      msg: message,
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.CENTER,
+      timeInSecForIosWeb: 1,
+      backgroundColor: isSuccess ? Colors.green : Colors.red,
+      textColor: Colors.white,
+      fontSize: 16.0,
+      webPosition: 'center', // Adjust for web if needed
+      webBgColor:
+          isSuccess ? Colors.green : Colors.red, // Adjust for web if needed
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Item Detail'),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.shopping_cart),
+            onPressed: () {
+              Navigator.pushNamed(context, "/cart");
+            },
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -21,11 +48,19 @@ class ProductDetailPage extends StatelessWidget {
             // Carousel
             CarouselSlider(
               items: [
-                Image.asset("lib/assets/images/carousel_image1.jpeg"),
-                Image.asset("lib/assets/images/carousel_image2.jpeg"),
-                Image.asset("lib/assets/images/carousel_image3.jpeg"),
-                Image.asset("lib/assets/images/carousel_image4.jpeg"),
-                Image.asset("lib/assets/images/carousel_image5.jpeg"),
+                Image.network(
+                  product.images.isNotEmpty
+                      ? product.images[0]
+                      : "", // Use the first image URL if available
+                  width: 150.0,
+                  height: 150.0,
+                  fit: BoxFit.cover,
+                )
+                // Image.asset("lib/assets/images/carousel_image1.jpeg"),
+                // Image.asset("lib/assets/images/carousel_image2.jpeg"),
+                // Image.asset("lib/assets/images/carousel_image3.jpeg"),
+                // Image.asset("lib/assets/images/carousel_image4.jpeg"),
+                // Image.asset("lib/assets/images/carousel_image5.jpeg"),
               ],
               options: CarouselOptions(
                 height: 200.0,
@@ -62,6 +97,33 @@ class ProductDetailPage extends StatelessWidget {
                 Icon(Icons.star, color: Colors.yellow),
                 Text('4.5 (1000 sold)'),
               ],
+            ),
+            //Add to cart
+            ElevatedButton(
+              onPressed: () async {
+                final cartDatabaseHelper = CartDatabaseHelper();
+                final cartItem = CartItem(
+                  productId: product.productId.toString(),
+                  voucherId: 0,
+                  laundryId: 1,
+                  price: product.price,
+                  quantity: 1,
+                );
+
+                final addedId = await cartDatabaseHelper.addToCart(cartItem);
+                if (addedId != null) {
+                  //add success case
+                  showToast(context, "Product added to the cart", true);
+                } else {
+                  //fail to add case
+                  showToast(
+                      context, "Failed to add the product to the cart", false);
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                primary: Colors.blue, // Customize the button color
+              ),
+              child: Text("Add to Cart"),
             ),
 
             // Shop
@@ -127,6 +189,7 @@ class ProductDetailPage extends StatelessWidget {
                 },
               ),
             ),
+
             Padding(
               padding: EdgeInsets.all(15), //apply padding to all four sides
               child: Text(

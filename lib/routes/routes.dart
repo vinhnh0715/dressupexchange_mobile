@@ -1,3 +1,4 @@
+import 'package:dressupexchange_mobile/pages/product_pages/cart_page.dart';
 import 'package:flutter/material.dart';
 //Pages
 import 'package:dressupexchange_mobile/pages/home_page.dart';
@@ -33,7 +34,8 @@ Route<dynamic> generateRoute(RouteSettings settings) {
         );
       }
       return _errorRoute();
-
+    case "/cart":
+      return MaterialPageRoute(builder: (context) => CartPage());
     case "/introduction":
       return MaterialPageRoute(builder: (context) => IntroductionScreens());
     default:
