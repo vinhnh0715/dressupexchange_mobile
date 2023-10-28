@@ -25,6 +25,20 @@ class _CartItemsWidgetState extends State<CartItemsWidget> {
     });
   }
 
+  // Function to delete a product from the cart
+  void deleteCartItem(String productId) async {
+    await cartDatabaseHelper.removeFromCart(productId);
+    fetchCartItems();
+  }
+
+  // Function to update the quantity of a product in the cart
+  void updateCartItemQuantity(String productId, int newQuantity) async {
+    final cartItem = cartItems.firstWhere((item) => item.productId == productId);
+    final updatedCartItem = cartItem.copyWith(quantity: newQuantity);
+    await cartDatabaseHelper.updateCartItem(updatedCartItem);
+    fetchCartItems();
+  }
+
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
@@ -32,14 +46,36 @@ class _CartItemsWidgetState extends State<CartItemsWidget> {
       itemBuilder: (context, index) {
         final cartItem = cartItems[index];
         return ListTile(
-          title:
-              Text(cartItem.productId), // Display product information as needed
-          subtitle: Text(
-              "Price: \$${cartItem.price}, Quantity: ${cartItem.quantity}"),
+          title: Text(cartItem.productId), // Display product information as needed
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text("Price: ${cartItem.price} VND"),
+              Row(
+                children: [
+                  IconButton(
+                    icon: Icon(Icons.remove),
+                    onPressed: () {
+                      if (cartItem.quantity > 1) {
+                        updateCartItemQuantity(cartItem.productId, cartItem.quantity - 1);
+                      }
+                    },
+                  ),
+                  Text("Quantity: ${cartItem.quantity}"),
+                  IconButton(
+                    icon: Icon(Icons.add),
+                    onPressed: () {
+                      updateCartItemQuantity(cartItem.productId, cartItem.quantity + 1);
+                    },
+                  ),
+                ],
+              ),
+            ],
+          ),
           trailing: IconButton(
             icon: Icon(Icons.delete),
             onPressed: () {
-              // Handle item removal from cart when this button is pressed
+              deleteCartItem(cartItem.productId);
             },
           ),
         );

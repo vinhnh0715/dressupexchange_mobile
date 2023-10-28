@@ -18,9 +18,12 @@ Future<void> _saveNotificationToStorage(RemoteMessage message) async {
   }
 }
 
-void configureFirebaseMessagingAndLocalNotifications(
-    FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin) {
+Future<void> configureFirebaseMessagingAndLocalNotifications(FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin) async {
   FirebaseMessaging messaging = FirebaseMessaging.instance;
+  var token = await messaging.getToken();
+  String tkn = token.toString();
+  print("FCM Token:");
+  print(tkn);
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
     if (message.notification != null) {
@@ -33,8 +36,7 @@ void configureFirebaseMessagingAndLocalNotifications(
           android: AndroidNotificationDetails(
             'due_channel',
             'DUE Promotion',
-            channelDescription:
-                "Receive notifications about exciting cosplay clothing promotions",
+            channelDescription: "Receive notifications about exciting cosplay clothing promotions",
             importance: Importance.max,
           ),
         ),

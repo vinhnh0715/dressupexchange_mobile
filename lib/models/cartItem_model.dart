@@ -32,4 +32,19 @@ class CartItem {
       quantity: map['quantity'],
     );
   }
+  CartItem copyWith({
+    String? productId,
+    int? voucherId,
+    int? laundryId,
+    double? price,
+    int? quantity,
+  }) {
+    return CartItem(
+      productId: productId ?? this.productId,
+      voucherId: voucherId ?? this.voucherId,
+      laundryId: laundryId ?? this.laundryId,
+      price: price ?? this.price,
+      quantity: quantity ?? this.quantity,
+    );
+  }
 }

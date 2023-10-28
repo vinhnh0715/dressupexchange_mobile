@@ -9,7 +9,7 @@ class ApiService {
   static const String baseUrl = 'https://dressupexchange.somee.com/api';
   final _secureStorage = FlutterSecureStorage();
   //====================Login/Register====================
-  Future<String> fetchAccessToken(String phone, String password) async {
+  Future<Map<String, dynamic>> fetchUserResponse(String phone, String password) async {
     final url = Uri.parse('$baseUrl/user/login');
     final Map<String, dynamic> requestBody = {
       'phone': phone,
@@ -26,23 +26,41 @@ class ApiService {
     );
 
     if (response.statusCode == 200) {
-      final String accessToken = response.body;
-      final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
-      final String name = jsonResponse['name'];
-      final String phoneNumber = jsonResponse['phoneNumber'];
-      if (name != null && phoneNumber != null) {
-        await _secureStorage.write(key: 'name', value: name.toString());
-        await _secureStorage.write(
-            key: 'phone_number', value: phoneNumber.toString());
+      final jsonResponse = jsonDecode(response.body);
+      if (jsonResponse['accessToken'] != null) {
+        await storeUserFieldsToSecureStorage(jsonResponse);
+        await _secureStorage.write(key: 'password', value: password);
+        return jsonResponse;
+      } else {
+        throw Exception('Access token is missing in the response');
       }
-      return accessToken;
     } else {
-      throw Exception('Failed to fetch access token');
+      throw Exception('Failed to fetch user response');
     }
   }
 
-  Future<void> registerUser(
-      String phoneNumber, String password, String name, String address) async {
+  Future<void> storeUserFieldsToSecureStorage(Map<String, dynamic> jsonResponse) async {
+    final userId = jsonResponse['userId'];
+    final phoneNumber = jsonResponse['phoneNumber'];
+    final address = jsonResponse['address'];
+    final name = jsonResponse['name'];
+    final role = jsonResponse['role'];
+    final accessToken = jsonResponse['accessToken'];
+    final refreshToken = jsonResponse['refreshToken'];
+    if (userId != null && phoneNumber != null && address != null && name != null && role != null && accessToken != null && refreshToken != null) {
+      await _secureStorage.write(key: 'userId', value: userId.toString());
+      await _secureStorage.write(key: 'phoneNumber', value: phoneNumber.toString());
+      await _secureStorage.write(key: 'address', value: address.toString());
+      await _secureStorage.write(key: 'name', value: name.toString());
+      await _secureStorage.write(key: 'role', value: role.toString());
+      await _secureStorage.write(key: 'accessToken', value: accessToken.toString());
+      await _secureStorage.write(key: 'refreshToken', value: refreshToken.toString());
+    } else {
+      throw Exception('One or more user fields are missing in the response');
+    }
+  }
+
+  Future<void> registerUser(String phoneNumber, String password, String name, String address) async {
     final url = Uri.parse('$baseUrl/user/register');
     final Map<String, dynamic> requestBody = {
       'phoneNumber': phoneNumber,
@@ -60,16 +78,25 @@ class ApiService {
     );
 
     if (response.statusCode == 200) {
-      // User registration was successful.
-      // You can handle the response accordingly, e.g., navigate to the login screen.
     } else {
       throw Exception('Failed to register user');
     }
   }
 
-  //====================Get Access Token====================
+  //====================Logout====================
+  Future<void> logout() async {
+    await _secureStorage.delete(key: 'userId');
+    await _secureStorage.delete(key: 'phoneNumber');
+    await _secureStorage.delete(key: 'address');
+    await _secureStorage.delete(key: 'name');
+    await _secureStorage.delete(key: 'role');
+    await _secureStorage.delete(key: 'accessToken');
+    await _secureStorage.delete(key: 'refreshToken');
+  }
+
+  //====================Getters====================
   Future<String?> getAccessToken() async {
-    return await _secureStorage.read(key: 'access_token');
+    return await _secureStorage.read(key: 'accessToken');
   }
 
   //====================Product===============================
@@ -102,22 +129,17 @@ class ApiService {
       throw Exception('Access token not found. Please log in first.');
     }
 
-    final url = Uri.parse('$baseUrl/order/place');
+    final url = Uri.parse('$baseUrl/order');
     final Map<String, dynamic> requestBody = {
       'totalAmount': order.totalAmount,
+      'shippingAddress': order.shippingAddress,
       'orderItemsRequest': order.orderItems.map((item) {
         return {
-          'productID': item.productID,
-          'productName': item.productName,
-          'quantityBuy': item.quantityBuy,
-          'status': item.status,
+          'productId': item.productId,
+          'voucherId': item.voucherId,
+          'laundryId': item.laundryId,
           'price': item.price,
-          'laundry': item.laundry.map((laundry) {
-            return {
-              'laundryName': laundry.laundryName,
-              'laundryPrice': laundry.laundryPrice,
-            };
-          }).toList(),
+          'buyingQuantity': item.buyingQuantity,
         };
       }).toList(),
     };
@@ -132,12 +154,68 @@ class ApiService {
     );
 
     if (response.statusCode == 200) {
-      // Order placement was successful.
-      // You can handle the response accordingly, e.g., show a success message.
       return Order.fromJson(jsonDecode(response.body));
     } else {
       throw Exception('Failed to place the order');
     }
   }
+
   //====================User====================
+  Future<void> updateUserProfile(String phoneNumber, String password, String name, String address) async {
+    final accessToken = await getAccessToken();
+    if (accessToken == null) {
+      throw Exception('Access token not found. Please log in first.');
+    }
+
+    final userId = await _secureStorage.read(key: 'userId');
+    if (userId == null) {
+      throw Exception('User ID not found in secure storage.');
+    }
+
+    final url = Uri.parse('$baseUrl/user/$userId');
+    final Map<String, dynamic> requestBody = {
+      'phoneNumber': phoneNumber,
+      'password': password,
+      'name': name,
+      'address': address,
+    };
+
+    final response = await http.put(
+      url,
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode(requestBody),
+    );
+
+    if (response.statusCode == 200) {
+      // Update user fields in secure storage if needed
+      await _secureStorage.write(key: 'phoneNumber', value: phoneNumber);
+      await _secureStorage.write(key: 'password', value: password);
+      await _secureStorage.write(key: 'name', value: name);
+      await _secureStorage.write(key: 'address', value: address);
+    } else {
+      throw Exception('Failed to update user profile');
+    }
+  }
+
+  Future<void> sendOTP(String phoneNumber) async {
+    final url = Uri.parse('$baseUrl/send-sms/SendOTP?telephoneNumber=$phoneNumber');
+
+    final response = await http.post(
+      url,
+      headers: <String, String>{
+        'accept': '*/*',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      // OTP sent successfully
+      print('OTP sent successfully');
+    } else {
+      // Handle the error case when OTP sending fails
+      throw Exception('Failed to send OTP. Status code: ${response.statusCode}');
+    }
+  }
 }

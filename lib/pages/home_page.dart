@@ -76,7 +76,7 @@ class _HomePageState extends State<HomePage> {
                   return GridView.builder(
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
-                      childAspectRatio: 0.7,
+                      childAspectRatio: 0.6,
                     ),
                     itemCount: snapshot.data!.length,
                     itemBuilder: (context, index) {
@@ -96,9 +96,7 @@ class _HomePageState extends State<HomePage> {
                             children: [
                               Center(
                                 child: Image.network(
-                                  product.images.isNotEmpty
-                                      ? product.images[0]
-                                      : "", // Use the first image URL if available
+                                  product.images.isNotEmpty ? product.images[0] : "", // Use the first image URL if available
                                   width: 150.0,
                                   height: 150.0,
                                   fit: BoxFit.cover,
@@ -143,8 +141,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _navigateToProductDetail(BuildContext context, Product product) {
-    Navigator.pushNamed(context, "/productDetail",
-        arguments: {'product': product});
+    Navigator.pushNamed(context, "/productDetail", arguments: {'product': product});
   }
 
   String truncateTitle(String title, int maxLength) {

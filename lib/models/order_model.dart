@@ -1,70 +1,47 @@
 class Order {
-  final int totalAmount;
+  final double totalAmount;
+  final String shippingAddress;
   final List<OrderItem> orderItems;
 
   Order({
     required this.totalAmount,
+    required this.shippingAddress,
     required this.orderItems,
   });
 
   factory Order.fromJson(Map<String, dynamic> json) {
-    final List<dynamic> orderItemsJson = json['orderItems'];
-    final List<OrderItem> orderItems =
-        orderItemsJson.map((item) => OrderItem.fromJson(item)).toList();
+    final List<OrderItem> orderItems = (json['orderItemsRequest'] as List<dynamic>?)?.map((item) => OrderItem.fromJson(item)).toList() ?? [];
 
     return Order(
-      totalAmount: json['totalAmount'],
+      totalAmount: json['totalAmount']?.toDouble() ?? 0.0,
+      shippingAddress: json['shippingAddress'] ?? '',
       orderItems: orderItems,
     );
   }
 }
 
 class OrderItem {
-  final int productID;
-  final String productName;
-  final int quantityBuy;
-  final String status;
-  final String price;
-  final List<Laundry> laundry;
+  final int productId;
+  final int voucherId;
+  final int laundryId;
+  final double price;
+  final int buyingQuantity;
 
   OrderItem({
-    required this.productID,
-    required this.productName,
-    required this.quantityBuy,
-    required this.status,
+    required this.productId,
+    required this.voucherId,
+    required this.laundryId,
     required this.price,
-    required this.laundry,
+    required this.buyingQuantity,
   });
 
   factory OrderItem.fromJson(Map<String, dynamic> json) {
-    final List<dynamic> laundryJson = json['laundry'];
-    final List<Laundry> laundry =
-        laundryJson.map((item) => Laundry.fromJson(item)).toList();
-
     return OrderItem(
-      productID: json['productID'],
-      productName: json['productName'],
-      quantityBuy: json['quantityBuy'],
-      status: json['status'],
-      price: json['price'],
-      laundry: laundry,
-    );
-  }
-}
-
-class Laundry {
-  final String laundryName;
-  final String laundryPrice;
-
-  Laundry({
-    required this.laundryName,
-    required this.laundryPrice,
-  });
-
-  factory Laundry.fromJson(Map<String, dynamic> json) {
-    return Laundry(
-      laundryName: json['laundryName'],
-      laundryPrice: json['laundryPrice'],
+      productId: json['productId'],
+      voucherId: json['voucherId'],
+      laundryId: json['laundryId'],
+      price: json['price'].toDouble(),
+      buyingQuantity: json['buyingQuantity'],
     );
   }
 }

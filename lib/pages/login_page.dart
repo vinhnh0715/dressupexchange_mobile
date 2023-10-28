@@ -6,20 +6,14 @@ class LoginPage extends StatelessWidget {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final ApiService _apiService = ApiService();
-  final _secureStorage =
-      FlutterSecureStorage(); // Create an instance of FlutterSecureStorage
+  final _secureStorage = FlutterSecureStorage(); // Create an instance of FlutterSecureStorage
 
   void _login(BuildContext context) async {
     final String username = _usernameController.text;
     final String password = _passwordController.text;
 
     try {
-      final accessToken =
-          await _apiService.fetchAccessToken(username, password);
-
-      // Store the accessToken securely in flutter_secure_storage
-      await _secureStorage.write(key: 'access_token', value: accessToken);
-
+      final accessToken = await _apiService.fetchUserResponse(username, password);
       // Navigate to the home screen upon successful login
       Navigator.pushNamed(context, "/home");
     } catch (e) {
@@ -73,6 +67,13 @@ class LoginPage extends StatelessWidget {
                 primary: Colors.orangeAccent,
               ),
               child: Text("Login"),
+            ),
+            SizedBox(height: 16),
+            TextButton(
+              onPressed: () {
+                Navigator.pushNamed(context, "/forgot_password");
+              },
+              child: Text("Forgot Password?"),
             ),
           ],
         ),

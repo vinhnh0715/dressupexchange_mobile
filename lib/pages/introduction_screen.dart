@@ -13,8 +13,7 @@ class IntroductionScreens extends StatelessWidget {
           pages: [
             PageViewModel(
               title: 'Welcome to DressUpExchange',
-              body:
-                  'Get ready to unleash your inner hero, villain, or any character you desire!',
+              body: 'Get ready to unleash your inner hero, villain, or any character you desire!',
               image: Image.asset(
                 "lib/assets/icons/shop.png",
                 width: 150.0,
@@ -26,8 +25,7 @@ class IntroductionScreens extends StatelessWidget {
             ),
             PageViewModel(
               title: 'Discover',
-              body:
-                  'Browse our vast collection and find the perfect look to bring your favorite characters to life.',
+              body: 'Browse our vast collection and find the perfect look to bring your favorite characters to life.',
               image: Image.asset(
                 "lib/assets/icons/browse.jpg",
                 width: 150.0,
@@ -39,8 +37,7 @@ class IntroductionScreens extends StatelessWidget {
             ),
             PageViewModel(
               title: 'Get Started',
-              body:
-                  'Your cosplay adventure starts now! Sign up to unlock exclusive features, save your favorite costumes, and start shopping for the perfect outfit.',
+              body: 'Your cosplay adventure starts now! Sign up to unlock exclusive features, save your favorite costumes, and start shopping for the perfect outfit.',
               image: Image.asset(
                 "lib/assets/icons/start.png",
                 width: 150.0,
@@ -62,11 +59,9 @@ class IntroductionScreens extends StatelessWidget {
           showNextButton: true,
           showSkipButton: true,
           // isBottomSafeArea: true,
-          skip:
-              const Text("Skip", style: TextStyle(fontWeight: FontWeight.w600)),
+          skip: const Text("Skip", style: TextStyle(fontWeight: FontWeight.w600)),
           next: const Icon(Icons.forward),
-          done:
-              const Text("Done", style: TextStyle(fontWeight: FontWeight.w600)),
+          done: const Text("Done", style: TextStyle(fontWeight: FontWeight.w600)),
           dotsDecorator: getDotsDecorator()),
     );
   }
