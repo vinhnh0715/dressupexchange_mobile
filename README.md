@@ -17,3 +17,13 @@ A Flutter project for buying and selling cosplay costume in HoChiMinh City, Viet
 * Guides for beginners : https://drive.google.com/drive/folders/1M1MeQvd6nNakK5LGaoatV_2lz9vE_3zO
 * Previous flutter project : https://github.com/vinhnh0715/vouch-tour-mobile
 * App Features : https://docs.google.com/spreadsheets/d/1oPaoBDMviZa-v7gkdUbpMO2jpa4RQbQGqQ6ilti9590/edit#gid=0
+
+## Progress
+- FCM
+- Login
+- Register
+- Forgot password
+- Load product
+- View profile
+- Add to cart
+- Place order
